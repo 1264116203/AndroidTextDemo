@@ -15,9 +15,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -52,7 +50,10 @@ public class MainActivity extends AppCompatActivity {
     int[] random_ques;
     private CountDownTimer mTimer;
     //随机数集合
-    private Set randomset;
+    private static Set randomset;
+    private AlertDialog firstDialog;
+    DBHelper quesDB;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,15 +76,17 @@ public class MainActivity extends AppCompatActivity {
         String[] from = {"id", "strque"};
         int[] to = {R.id.item_num, R.id.item_text};
         //使用SimpleAdapter填充ListView
-        SimpleAdapter simpleAdapter = new SimpleAdapter(MainActivity.this, lists, R.layout.item, from, to);
+        SimpleAdapter simpleAdapter = new SimpleAdapter(MainActivity.this, lists, R.layout.mainlist_item, from, to);
         mListView.setAdapter(simpleAdapter);
 
     }
 
     public void start(View view) {
+        for (int i = 0; i < 5; i++) {
+            Dialogshow(i);
+        }
 
-        Dialogshow();
-
+        Random_Num(5,10);
 
 
     }
@@ -104,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MusicService.class);
             stopService(intent);
             Flag_isplaying = 0;
+            play.setText("播放");
+
         }
 
     }
@@ -138,16 +143,25 @@ public class MainActivity extends AppCompatActivity {
      * 弹窗显示
      */
     private void Dialogshow(int which) {
+        //设置最大题目范围
         if (counter<6) {
-            if (counter!=0&&which==result[random_ques[counter-1]]) {
-                score+=20;}
+            //如果当前题目在0~5之间 则成绩+20分
+                if (counter!=0&&which==result[random_ques[counter-1]]) {
+                    score+=20;
+                }
             AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                //为倒计时控件设置属性
             TextView   txv=new TextView(this);
             txv.setGravity(Gravity.CENTER);
             txv.setTextSize(40);
+
             builder.setTitle("快乐答题 gogogo");
-            if (counter==5) //判断是否达到最大题目数
-            {
+            /**
+             *  如果达到最大题目数  统计成绩显示到最后的弹窗并获取当前时间
+             */
+            //判断是否达到最大题目数
+            if (counter==5) {
+                //获取日历的实例
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 //获得系统时间
@@ -158,25 +172,28 @@ public class MainActivity extends AppCompatActivity {
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 //分钟
                 int minute = calendar.get(Calendar.MINUTE);
+                //合并字符串
                 String string=year+"年"+month+"月"+day+"日 "+hour+":"+minute;
                 builder.setMessage("你的得分为："+score+"分");
+                //new contentValues对象来存储数据
                 ContentValues contentValues=new ContentValues();
                 contentValues.put("Score", score);
                 contentValues.put("Date", string);
-//                quesDB.insert(contentValues, "Score_tab");
+                quesDB.insert(contentValues, "Score_tab");
                 //保存得分到Score_tab
             }else{// 未达到最大题目数 继续下一题
-                builder.setMessage(ques[random_ques[counter]]);}
+                builder.setMessage(ques[random_ques[counter]]);
+            }
             builder.setView(txv);
             if (counter<5) {
-                builder.setPositiveButton("是", this);
-                builder.setNegativeButton("不是", this);}
+                builder.setPositiveButton("是", (DialogInterface.OnClickListener) this);
+                builder.setNegativeButton("不是", (DialogInterface.OnClickListener) this);}
              isSelected = false;
-            firstDialog=builder.create();
+            firstDialog = builder.create();
             firstDialog.show();
             counter++;
             countdown(txv, firstDialog);
-            firstDialog.setOnDismissListener(new OnDismissListener() {
+            firstDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     firstDialog = null;
@@ -184,12 +201,12 @@ public class MainActivity extends AppCompatActivity {
                         // 停止countDownTimer
                         mTimer.cancel();
                         mTimer=null;}
-                    if (isSelected ==true) {
-                        Dialogshow(resultcode);//计算得分进入下一个问题展示页面
-                        isSelected =false;
-                    }else {
-                        Dialogshow(0);
-                    }
+//                    if (isSelected ==true) {
+//                        Dialogshow(resultcode);//计算得分进入下一个问题展示页面
+//                        isSelected =false;
+//                    }else {
+//                        Dialogshow(0);
+//                    }
                 }
             });
         }
@@ -223,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static void Random_Num(int num_count, int num_range) {
         for (int i = 0; i < num_count; i++) {
+            Random ran = null;
             randomset.add(ran.nextInt(num_range));
         }
         if (randomset.size() < num_count) {

@@ -17,11 +17,11 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        try {
-            mPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mPlayer.prepare();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
