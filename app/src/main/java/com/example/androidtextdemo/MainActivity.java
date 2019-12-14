@@ -19,6 +19,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,14 +29,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity {
+
     //准备题目资源
     String[] ques = {
-            "测试数据", "测试数据", "测试数据", "测试数据", "测试数据", "测试数据", "测试数据", "测试数据",
+            "android虚拟设备的缩写是ADB", "Service中不能执行耗时操作", "android 中Intent的作用的是实现应用程序间的数据共享",
+            "在android中使用Menu时可能需要重写的方法是：onCreateOptionsMenu()，onOptionsItemSelected()",
+            "退出Activity错误的方法是：System.exit()", "测试数据", "测试数据", "测试数据",
     };
+   static Set<Integer> set;
     //准备答案数组
-    int [] result;
-    //使用集合接收数据
+    int[] result;
+    //使用集合接收ListView数据
     List<Map<String, ?>> lists;
+//    static Set<Integer> setRan = new HashSet<Integer>();
     ListView mListView;
     //判断播放器是否在播放
     int Flag_isplaying = 0;
@@ -47,12 +55,13 @@ public class MainActivity extends AppCompatActivity {
     //用户是否选择了
     boolean isSelected;
     //随机数组
-    int[] random_ques;
+    static int[] random_ques;
     private CountDownTimer mTimer;
     //随机数集合
     private static Set randomset;
     private AlertDialog firstDialog;
     DBHelper quesDB;
+    private static Random ran;
 
 
     @Override
@@ -61,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         play = findViewById(R.id.bt_player);
         mListView = findViewById(R.id.list_main);
-        randomset=new TreeSet();
+        randomset = new TreeSet();
         //设置标题
         this.setTitle("一起学习吧");
 
@@ -82,11 +91,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        for (int i = 0; i < 5; i++) {
-            Dialogshow(i);
-        }
 
-        Random_Num(5,10);
+        Random_Num(5, ques.length);
+
+//        for (int i = 0; i < 5; i++) {
+//            Dialogshow(i);
+//        }
+
 
 
     }
@@ -101,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MusicService.class);
             startService(intent);
             Flag_isplaying = 1;
-            play.setText("暂停");
+            play.setText("停止");
 
         } else {
             Intent intent = new Intent(this, MusicService.class);
@@ -144,14 +155,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void Dialogshow(int which) {
         //设置最大题目范围
-        if (counter<6) {
+        if (counter < 6) {
             //如果当前题目在0~5之间 则成绩+20分
-                if (counter!=0&&which==result[random_ques[counter-1]]) {
-                    score+=20;
-                }
-            AlertDialog.Builder builder=new AlertDialog.Builder(this);
-                //为倒计时控件设置属性
-            TextView   txv=new TextView(this);
+            if (counter != 0 && which == result[random_ques[counter - 1]]) {
+                score += 20;
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            //为倒计时控件设置属性
+            TextView txv = new TextView(this);
             txv.setGravity(Gravity.CENTER);
             txv.setTextSize(40);
 
@@ -160,12 +171,12 @@ public class MainActivity extends AppCompatActivity {
              *  如果达到最大题目数  统计成绩显示到最后的弹窗并获取当前时间
              */
             //判断是否达到最大题目数
-            if (counter==5) {
+            if (counter == 5) {
                 //获取日历的实例
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 //获得系统时间
-                int month = calendar.get(Calendar.MONTH)+1;
+                int month = calendar.get(Calendar.MONTH) + 1;
                 //日
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
                 //小时
@@ -173,22 +184,33 @@ public class MainActivity extends AppCompatActivity {
                 //分钟
                 int minute = calendar.get(Calendar.MINUTE);
                 //合并字符串
-                String string=year+"年"+month+"月"+day+"日 "+hour+":"+minute;
-                builder.setMessage("你的得分为："+score+"分");
+                String string = year + "年" + month + "月" + day + "日 " + hour + ":" + minute;
+                builder.setMessage("你的得分为：" + score + "分");
                 //new contentValues对象来存储数据
-                ContentValues contentValues=new ContentValues();
+                ContentValues contentValues = new ContentValues();
                 contentValues.put("Score", score);
                 contentValues.put("Date", string);
                 quesDB.insert(contentValues, "Score_tab");
                 //保存得分到Score_tab
-            }else{// 未达到最大题目数 继续下一题
+            } else {// 未达到最大题目数 继续下一题
                 builder.setMessage(ques[random_ques[counter]]);
             }
             builder.setView(txv);
-            if (counter<5) {
-                builder.setPositiveButton("是", (DialogInterface.OnClickListener) this);
-                builder.setNegativeButton("不是", (DialogInterface.OnClickListener) this);}
-             isSelected = false;
+            if (counter < 5) {
+                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.out.println(which);
+                    }
+                });
+                builder.setNegativeButton("不是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+            }
+            isSelected = false;
             firstDialog = builder.create();
             firstDialog.show();
             counter++;
@@ -197,16 +219,17 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     firstDialog = null;
-                    if (mTimer!=null) {
+                    if (mTimer != null) {
                         // 停止countDownTimer
                         mTimer.cancel();
-                        mTimer=null;}
-//                    if (isSelected ==true) {
-//                        Dialogshow(resultcode);//计算得分进入下一个问题展示页面
-//                        isSelected =false;
-//                    }else {
-//                        Dialogshow(0);
-//                    }
+                        mTimer = null;
+                    }
+                    //                    if (isSelected ==true) {
+                    //                        Dialogshow(resultcode);//计算得分进入下一个问题展示页面
+                    //                        isSelected =false;
+                    //                    }else {
+                    //                        Dialogshow(0);
+                    //                    }
                 }
             });
         }
@@ -216,36 +239,50 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 倒计时显示
      */
-    public void countdown (TextView txv, AlertDialog Dialog){
-        final TextView txv_count=txv;
+    public void countdown(TextView txv, AlertDialog Dialog) {
+        final TextView txv_count = txv;
         txv_count.setTextColor(Color.rgb(255, 00, 00));
-        final AlertDialog myDialog=Dialog;
-        mTimer=new CountDownTimer(11000,1000) {
+        final AlertDialog myDialog = Dialog;
+        mTimer = new CountDownTimer(11000, 1000) {
             @Override
-            public void onTick(long millisUntilFinished){
-                txv_count.setText((millisUntilFinished/1000)+"s");
+            public void onTick(long millisUntilFinished) {
+                txv_count.setText((millisUntilFinished / 1000) + "s");
             }
+
             @Override
             public void onFinish() {
-                if (myDialog!=null) {
-                    myDialog.dismiss();}
-            }};
+                if (myDialog != null) {
+                    myDialog.dismiss();
+                }
+            }
+        };
         mTimer.start();
     }
 
     /**
-     *   生成随机数
+     * 生成随机数
      */
 
 
     public static void Random_Num(int num_count, int num_range) {
+       set = new HashSet<Integer>();
         for (int i = 0; i < num_count; i++) {
-            Random ran = null;
-            randomset.add(ran.nextInt(num_range));
+             ran = new Random();
+            set.add(ran.nextInt(num_range));
         }
-        if (randomset.size() < num_count) {
-            Random_Num(num_count - randomset.size(), num_range);
+        Iterator<Integer> it = set.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
         }
+
+        //        if (randomset.size() < num_count) {
+//            Random_Num(num_count - randomset.size(), num_range);
+//        }
+//        setRan = set;
+//        List<Integer> numRandom = new ArrayList<Integer>(setRan);
+//        for (int i = 0; i < numRandom.size(); i++) {
+//            random_ques[i]=numRandom.get(i);
+//        }
     }
 
 }
