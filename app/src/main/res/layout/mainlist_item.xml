@@ -12,12 +12,20 @@
             android:id="@+id/item_num"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="20dp"
             android:text="TextView" />
 
         <TextView
             android:id="@+id/item_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/item_answer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
             android:text="TextView" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
