@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -65,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
     //用户是否选择了
     boolean isSelected;
     //随机数组
-    static int[] random_ques = new int[5];
+    static int[] random_ques =new int[20];
     private CountDownTimer mTimer;
     //随机数集合
-    private static SortedSet<Integer> randomset;
+    private static Set<Integer> randomset;
     private AlertDialog firstDialog;
     DBHelper quesDB;
     private static Random ran;
@@ -104,9 +105,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        counter_num = 3;
+        counter_num = 5;
+        random_ques =new int[counter_num];
         Random_Num(counter_num, ques.length);
-        randomset = new TreeSet();
+        randomset = new LinkedHashSet();
         Dialogshow(witch, counter_num);
         counter = 0;
     }
@@ -168,7 +170,11 @@ public class MainActivity extends AppCompatActivity {
         if (counter <= counter_num) {
             System.out.println("witch=" + witch);
             //如果当前题目在0~5之间 则成绩+20分
+            System.out.println("count:"+counter);
+            System.out.println("random_ques[counter]=" + random_ques[counter]);
             System.out.println("result[random_ques[counter - 1]=" + result[random_ques[counter-1]]);
+            System.out.println("-------------------");
+
             if (counter_num != 0 && String.valueOf(which).equals(result[random_ques[counter-1]])) {
                 score += 20;
                 System.out.println("score=" + score);
@@ -207,9 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 quesDB.insert(contentValues, "Score_tab");
                 //保存得分到Score_ta
             } else {// 未达到最大题目数 继续下一题
-                System.out.println("counter=" + counter);
-                System.out.println("random_ques的长度：" + random_ques.length);
-                System.out.println("random_ques[counter]=" + random_ques[counter]);
+
+
                 builder.setMessage(ques[random_ques[counter]]);
             }
 
@@ -233,8 +238,6 @@ public class MainActivity extends AppCompatActivity {
             firstDialog = builder.create();
             firstDialog.show();
             counter++;
-            System.out.println("counter++后=" + counter);
-            System.out.println("-------------------");
             countdown( firstDialog);
             firstDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -291,10 +294,16 @@ public class MainActivity extends AppCompatActivity {
     public static void Random_Num(int num_count, int num_range) {
         for (int i = 0; i < num_count; i++) {
             randomset.add(ran.nextInt(num_range));
+
         }
         if (randomset.size() < num_count) {
             Random_Num(num_count - randomset.size(), num_range);
         }
+        ArrayList<Integer> arrayList = new ArrayList<>(randomset);
+        for (int i = 0; i < randomset.size(); i++) {
+            random_ques[i]=arrayList.get(i);
+        }
+
     }
 
 
