@@ -44,8 +44,7 @@ public class MainActivity extends AppCompatActivity {
             "query方法，是ContentProvider对象的方法",
             "对于一个已经存在的SharedPreferences对象setting,想向其中存入一个字符串\"person\",setting应该先调用edit()",
     };
-    //初始化倒计时控件
-    TextView txv = null;
+
     int witch = -1;
     //准备答案数组
     int[] result_array = {-1, -2, -2, -1, -2, -1, -1, -1, -2, -1};
@@ -57,12 +56,8 @@ public class MainActivity extends AppCompatActivity {
     //判断播放器是否在播放
     int Flag_isplaying;
     TextView play;
-    //总成绩数值统计
-    int score = 0;
-    //剩余时间初始化
-    int lefttime = 10;
     Dialogshowclass mDialogshowclass;
-    //当前题目号
+
 
 
 
@@ -92,13 +87,13 @@ public class MainActivity extends AppCompatActivity {
         //使用SimpleAdapter填充ListView
         SimpleAdapter simpleAdapter = new SimpleAdapter(MainActivity.this, lists, R.layout.mainlist_item, from, to);
         mListView.setAdapter(simpleAdapter);
-        mDialogshowclass = new Dialogshowclass(this,ques_array,result_array,txv);
+         mDialogshowclass = new Dialogshowclass(this,ques_array,result_array);
 
     }
 
     public void start(View view) {
 
-        mDialogshowclass.Dialogshow();
+        mDialogshowclass.Dialogshow(-1);
     }
 
     public void score(View view) {
