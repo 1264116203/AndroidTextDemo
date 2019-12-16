@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             "对于一个已经存在的SharedPreferences对象setting,想向其中存入一个字符串\"person\",setting应该先调用edit()",
     };
 
-    int witch = -1;
+    int count = 0;
     //准备答案数组
     int[] result_array = {-1, -2, -2, -1, -2, -1, -1, -1, -2, -1};
     //题目数量
@@ -57,11 +57,6 @@ public class MainActivity extends AppCompatActivity {
     int Flag_isplaying;
     TextView play;
     Dialogshowclass mDialogshowclass;
-
-
-
-
-
 
 
     @Override
@@ -87,13 +82,14 @@ public class MainActivity extends AppCompatActivity {
         //使用SimpleAdapter填充ListView
         SimpleAdapter simpleAdapter = new SimpleAdapter(MainActivity.this, lists, R.layout.mainlist_item, from, to);
         mListView.setAdapter(simpleAdapter);
-         mDialogshowclass = new Dialogshowclass(this,ques_array,result_array);
+        mDialogshowclass = new Dialogshowclass(this, ques_array, result_array,2);
 
     }
 
     public void start(View view) {
 
-        mDialogshowclass.Dialogshow(-1);
+        mDialogshowclass.Dialogshow(1, count);
+        count = 0;
     }
 
     public void score(View view) {
@@ -143,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
 
 
 }
