@@ -32,10 +32,10 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        edserach=findViewById(R.id.ed_serach);
-        imgserach=findViewById(R.id.img_serach);
+//        edserach=findViewById(R.id.ed_serach);
+//        imgserach=findViewById(R.id.img_serach);
         listhistory=findViewById(R.id.list_history);
-        imgserach.setOnClickListener(this);
+//        imgserach.setOnClickListener(this);
         listhistory.setOnItemLongClickListener(this);
 
         mDBHelper=new DBHelper(this);
@@ -46,7 +46,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         //使用SimpleCursorAdapter填充ListView
         SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this, R.layout.historylist_item, cursor, from, to,1);
         listhistory.setAdapter(simpleCursorAdapter);
-        cursor.close();
+//        cursor.close();
+//        mDBHelper.history_DB.close();
 
     }
     @Override
@@ -86,7 +87,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        mDBHelper.delete((int) id,"TABname");
+
+        mDBHelper.delete((int) id,"Score_tab");
         return false;
     }
 }

@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DBname = "history_db";
     private static final String TABname = "Score_tab";
-    private SQLiteDatabase history_DB;
+    public SQLiteDatabase history_DB;
 
     static final int version = 1;
     private Cursor cursor;
