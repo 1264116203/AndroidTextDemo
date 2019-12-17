@@ -12,8 +12,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * 弹窗显示
@@ -31,18 +33,16 @@ public class Dialogshowclass {
     String[] ques_array;
     int[] result_array;
     //随机数组
-    static int[] random_ques_array = new int[20];
-    private static Random ran;
+
+    private static Random ran=new Random();
     private AlertDialog firstDialog;
 
     //随机数集合
-    private static Set<Integer> randomset = new LinkedHashSet();
     ;
     //用户是否选择了
     boolean isSelected;
     Context context;
     DBHelper quesDB;
-    private CountDownTimer mTimer;
     private CountDownTimer myCountDownTimer;
 
     public Dialogshowclass(Context context, String[] ques_array, int[] result_array,int counter_num) {
@@ -52,18 +52,18 @@ public class Dialogshowclass {
         this.ques_array = ques_array;
         this.context = context;
         quesDB = new DBHelper(context);
-        Random_Num(counter_num, ques_array.length);
-
 
 
     }
 
-    public void Dialogshow(int which,int counter) {
+    public void Dialogshow(int which, int counter, int score, final int[] random_ques_array) {
+
         System.out.println("which=" + which);
         System.out.println("counter=" + counter);
         //System.out.println("result_array[random_ques_array[counter-1]]=" + result_array[random_ques_array[counter - 1]]);
         if (counter < counter_num + 1) {
             if (counter != 0 && which == result_array[random_ques_array[counter - 1]]) {
+                System.out.println("score="+score);
                 score += (100/counter_num);
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -116,6 +116,7 @@ public class Dialogshowclass {
             counter++;
             countdown(txv, firstDialog);
             final int finalCounter = counter;
+            final int finalScore = score;
             firstDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
@@ -126,21 +127,18 @@ public class Dialogshowclass {
                         myCountDownTimer = null;
                     }
                     if (isSelected == true) {
-                        Dialogshow(resultcode, finalCounter);//计算得分进入下一个问题展示页面
+                        Dialogshow(resultcode, finalCounter, finalScore,random_ques_array);//计算得分进入下一个问题展示页面
                         isSelected = false;
                     } else {
-                        Dialogshow(0, finalCounter);
+                        Dialogshow(0, finalCounter, finalScore,random_ques_array);
                     }
                 }
             });
         }
+//        randomset=null;
     }
 
-    //    @Override
-    //    public void onClick(DialogInterface dialog, int which) {
-    //        resultcode=which;
-    //        isSelected=true;
-    //    }
+
 
     /**
      * 倒计时显示
@@ -169,23 +167,21 @@ public class Dialogshowclass {
     /**
      * 生成随机数
      */
-
-
-    public static void Random_Num(int num_count, int num_range) {
-        ran = new Random();
-        randomset = new LinkedHashSet<>();
-        for (int i = 0; i < num_count; i++) {
-            randomset.add(ran.nextInt(num_range));
+    public static List Random_Num(int num_count, int num_range, List list) {
+        while (list.size() < num_count) {
+            int item = ran.nextInt(num_range);
+            boolean addflag = true;
+            for (int i = 0; i < list.size(); i++) {
+                int itemnum = (int) list.get(i);
+                if (item == itemnum) {
+                    addflag = false;
+                }
+            }
+            if (addflag) {
+                list.add(item);
+            }
         }
-        if (randomset.size() < num_count) {
-            Random_Num(num_count - randomset.size(), num_range);
-        }
-        ArrayList<Integer> arrayList = new ArrayList<>(randomset);
-        for (int i = 0; i < randomset.size(); i++) {
-            random_ques_array[i] = arrayList.get(i);
-        }
-
+        return list;
     }
-
 
 }

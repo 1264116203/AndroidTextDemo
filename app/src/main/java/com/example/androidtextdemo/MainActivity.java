@@ -33,19 +33,21 @@ public class MainActivity extends AppCompatActivity {
 
     //准备题目资源
     static String[] ques_array = {
-            "android虚拟设备的缩写是AVD",
-            "Service中不能执行耗时操作",
-            "android 中Intent的作用的是实现应用程序间的数据共享",
-            "在android中使用Menu时可能需要重写的方法是：onCreateOptionsMenu()，onOptionsItemSelected()",
-            "退出Activity错误的方法是：System.exit()",
-            "刘伟荣老师真帅！",
-            "Toast没有焦点",
-            "Toast只能持续一段时间",
-            "query方法，是ContentProvider对象的方法",
-            "对于一个已经存在的SharedPreferences对象setting,想向其中存入一个字符串\"person\",setting应该先调用edit()",
+            "0android虚拟设备的缩写是AVD",
+            "1Service中不能执行耗时操作",
+            "2android 中Intent的作用的是实现应用程序间的数据共享",
+            "3在android中使用Menu时可能需要重写的方法是：onCreateOptionsMenu()，onOptionsItemSelected()",
+            "4退出Activity错误的方法是：System.exit()",
+            "5刘伟荣老师真帅！",
+            "6Toast没有焦点",
+            "7Toast只能持续一段时间",
+            "8query方法，是ContentProvider对象的方法",
+            "9对于一个已经存在的SharedPreferences对象setting,想向其中存入一个字符串\"person\",setting应该先调用edit()",
     };
-
+    int score;
     int count = 0;
+    int count_num=10;
+    int[] random_ques_array = new int[20];
     //准备答案数组
     int[] result_array = {-1, -2, -2, -1, -2, -1, -1, -1, -2, -1};
     //题目数量
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         mListView = findViewById(R.id.list_main);
         //设置标题
         this.setTitle("一起学习吧");
-
         lists = new ArrayList<>();
         //        遍历数组添加进map 并将map添加进lists
         for (int i = 0; i < ques_array.length; i++) {
@@ -82,14 +83,23 @@ public class MainActivity extends AppCompatActivity {
         //使用SimpleAdapter填充ListView
         SimpleAdapter simpleAdapter = new SimpleAdapter(MainActivity.this, lists, R.layout.mainlist_item, from, to);
         mListView.setAdapter(simpleAdapter);
-        mDialogshowclass = new Dialogshowclass(this, ques_array, result_array,2);
-
+        mDialogshowclass = new Dialogshowclass(this, ques_array, result_array, count_num);
     }
 
     public void start(View view) {
-
-        mDialogshowclass.Dialogshow(1, count);
+      List list= new ArrayList();
+        List set = mDialogshowclass.Random_Num(count_num, ques_array.length, list);
+        ArrayList arrayList = new ArrayList<>(set);
+        for (int i = 0; i < arrayList.size(); i++) {
+            random_ques_array[i]= (int) arrayList.get(i);
+        }
+        System.out.println("方法外遍历set.size()="+set.size());
+        for (Object i : set) {
+            System.out.println("randomset=" + i);
+        }
+        mDialogshowclass.Dialogshow(1, count, score,random_ques_array);
         count = 0;
+        score = 0;
     }
 
     public void score(View view) {
